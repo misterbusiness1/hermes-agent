@@ -1,0 +1,32 @@
+name: Exact-head Nix verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: nix flake check (d02f3de)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout immutable PR head
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: d02f3de5f79fc881171b9b1da1089a7df6d07b51
+
+      - name: Assert immutable PR head
+        run: test "$(git rev-parse HEAD)" = d02f3de5f79fc881171b9b1da1089a7df6d07b51
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@630ae543ea3a38a9a4166f03376c02c50f408342 # v31.11.0
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            fallback = true
+            tarball-ttl = 3600
+
+      - name: nix flake check
+        run: nix flake check --print-build-logs
