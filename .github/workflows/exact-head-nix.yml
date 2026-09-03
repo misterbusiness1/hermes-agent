@@ -1,7 +1,8 @@
 name: Exact-head Nix verification
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ci/verify-d02f3de-nix]
 
 permissions:
   contents: read
